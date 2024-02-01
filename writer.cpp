@@ -23,10 +23,13 @@ void append(int token) {
         if (myMap.find(token) == myMap.end()) {
             std::cout << "Token Not Found" << std::endl;
 
-            std::string keyString = "SharedMem" + std::to_string(token);
-            key_t key = ftok(keyString.c_str(), token);
-            std::cout<< keyString.c_str() << token << std::endl;
-            std::cout<< key << std::endl;
+            key_t key = ftok("/home/finrise/project/sharedMem/mem", token);
+
+            if (key == -1) {
+                perror("ftok");
+            }
+
+            if(token == 1) std::cout<< " KEY : " << token << " Value : " << price << std::endl ;
 
             int shmid = shmget(key, sizeof(SharedData), 0666 | IPC_CREAT);
 
@@ -44,7 +47,7 @@ void append(int token) {
 
             myMap[token] = sharedData;
         } else {
-            std::cout << "Token Found: " << token << " : " << data << std::endl;
+            if(token == 1) std::cout<< " KEY : " << token << " Value : " << price << std::endl ;
             sharedData = myMap[token];
         }
     } // Unlock the map outside the critical section
@@ -60,7 +63,6 @@ int main() {
     while (true) {
         int randomToken = std::rand() % 10 + 1;
         append(randomToken);
-        usleep(500000);
     }
 
     // Cleanup before exiting
